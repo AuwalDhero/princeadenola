@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaling AI Across Organization - Strategic AI Clarity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        :root {
+            --navy: #0B1B3A;
+            --gold: #C9A44A;
+            --gold-dark: #A8832B;
+            --white: #FFFFFF;
+            --light: #F8F9FB;
+            --border: #E5E7EB;
+            --grey-text: #64748B;
+            --primary-text: #0F172A;
+            --secondary-text: var(--grey-text);
+            --accent: var(--gold);
+            --accent-dark: var(--gold-dark);
+            --deep: var(--navy);
+            --success-color: #16A34A;
+            --warning-color: #D97706;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--primary-bg);
+            color: var(--primary-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 80px;
+        }
+
+        .header {
+            background: var(--deep);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            margin-left: 32px;
+            font-weight: 500;
+            transition: 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .section {
+            padding: 120px 0 80px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--light) 0%, var(--white) 100%);
+            text-align: center;
+            padding: 140px 0 100px;
+        }
+
+        .hero-section h1 {
+            font-family: var(--font-heading);
+            font-size: 56px;
+            color: var(--deep);
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            color: var(--secondary-text);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .scaling-framework {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin: 60px 0;
+        }
+
+        .framework-stage {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-stage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%);
+        }
+
+        .stage-number {
+            background: var(--deep);
+            color: var(--gold);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .framework-stage h3 {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            color: var(--deep);
+            margin-bottom: 16px;
+        }
+
+        .framework-stage .timeline {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .framework-stage ul {
+            list-style: none;
+        }
+
+        .framework-stage li {
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .framework-stage li:before {
+            content: "→";
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .maturity-assessment {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 60px 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .maturity-assessment h3 {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            color: var(--deep);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .maturity-chart {
+            height: 400px;
+            margin: 30px 0;
+        }
+
+        .maturity-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin: 40px 0;
+        }
+
+        .maturity-level {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .maturity-level:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .level-number {
+            background: var(--deep);
+            color: var(--gold);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 16px;
+        }
+
+        .maturity-level h4 {
+            font-size: 18px;
+            color: var(--deep);
+            margin-bottom: 12px;
+        }
+
+        .maturity-level p {
+            color: var(--secondary-text);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .governance-framework {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin: 60px 0;
+        }
+
+        .governance-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .governance-card h3 {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            color: var(--deep);
+            margin-bottom: 24px;
+        }
+
+        .governance-card ul {
+            list-style: none;
+        }
+
+        .governance-card li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+        }
+
+        .governance-card li:last-child {
+            border-bottom: none;
+        }
+
+        .governance-card li:before {
+            content: "⚖️";
+            margin-right: 12px;
+        }
+
+        .success-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            margin: 60px 0;
+        }
+
+        .metric-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .metric-icon {
+            background: var(--deep);
+            color: var(--gold);
+            font-size: 32px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .metric-card h4 {
+            font-size: 16px;
+            color: var(--secondary-text);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .metric-card p {
+            color: var(--secondary-text);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--deep);
+            padding: 16px 30px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201, 164, 74, 0.3);
+        }
+
+        .cta-section {
+            background: var(--deep);
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .cta-section h2 {
+            font-family: var(--font-heading);
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .challenges-section {
+            background: var(--light);
+        }
+
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin: 60px 0;
+        }
+
+        .challenge-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.12);
+            border-color: var(--gold);
+        }
+
+        .challenge-icon {
+            background: var(--warning-color);
+            color: white;
+            font-size: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .challenge-card h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: var(--primary-text);
+            text-align: center;
+        }
+
+        .challenge-card p {
+            color: var(--secondary-text);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .solution-list {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .solution-list h5 {
+            color: var(--deep);
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .solution-list ul {
+            list-style: none;
+        }
+
+        .solution-list li {
+            padding: 4px 0;
+            font-size: 14px;
+            color: var(--secondary-text);
+        }
+
+        .solution-list li:before {
+            content: "✓";
+            color: var(--success-color);
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 24px;
+            }
+            
+            .nav-container {
+                padding: 0 24px;
+            }
+            
+            .hero-section h1 {
+                font-size: 42px;
+            }
+            
+            .governance-framework {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .challenges-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo-area">
+                <span style="color: var(--gold); font-family: var(--font-heading); font-size: 22px; font-weight: 600;">Adenola Adegbesan</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="exploring-ai-opportunities.html">Exploring</a>
+                <a href="planning-ai-implementation.html">Planning</a>
+                <a href="currently-implementing-ai.html">Implementing</a>
+                <a href="index.html#contact">Get Clarity</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1>Scaling AI Across the Organization</h1>
+            <p>Enterprise-wide AI transformation strategies that drive sustainable growth and competitive advantage.</p>
+            <a href="index.html#contact" class="btn-primary">Develop Your Scaling Strategy</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 style="text-align: center; font-family: var(--font-heading); font-size: 44px; color: var(--deep); margin-bottom: 60px;">AI Scaling Framework</h2>
+            
+            <div class="scaling-framework">
+                <div class="framework-stage">
+                    <div class="stage-number">1</div>
+                    <div class="timeline">Months 1-3</div>
+                    <h3>Foundation & Governance</h3>
+                    <ul>
+                        <li>Establish AI Center of Excellence</li>
+                        <li>Develop enterprise AI strategy and roadmap</li>
+                        <li>Create governance and compliance frameworks</li>
+                        <li>Build cross-functional AI teams</li>
+                        <li>Implement data infrastructure and standards</li>
+                        <li>Define success metrics and KPIs</li>
+                    </ul>
+                </div>
+
+                <div class="framework-stage">
+                    <div class="stage-number">2</div>
+                    <div class="timeline">Months 4-9</div>
+                    <h3>Pilot Expansion</h3>
+                    <ul>
+                        <li>Scale successful pilot projects</li>
+                        <li>Deploy AI across business functions</li>
+                        <li>Implement change management programs</li>
+                        <li>Establish training and development initiatives</li>
+                        <li>Build internal AI expertise and capabilities</li>
+                        <li>Monitor performance and optimize</li>
+                    </ul>
+                </div>
+
+                <div class="framework-stage">
+                    <div class="stage-number">3</div>
+                    <div class="timeline">Months 10-18</div>
+                    <h3>Enterprise Integration</h3>
+                    <ul>
+                        <li>Integrate AI into core business processes</li>
+                        <li>Implement advanced AI capabilities</li>
+                        <li>Foster AI-driven innovation culture</li>
+                        <li>Establish continuous improvement cycles</li>
+                        <li>Measure and communicate business impact</li>
+                        <li>Plan next-generation AI initiatives</li>
+                    </ul>
+                </div>
+
+                <div class="framework-stage">
+                    <div class="stage-number">4</div>
+                    <div class="timeline">Months 19-24</div>
+                    <h3>Innovation & Leadership</h3>
+                    <ul>
+                        <li>Drive AI-powered business transformation</li>
+                        <li>Establish industry leadership position</li>
+                        <li>Develop proprietary AI solutions</li>
+                        <li>Create competitive moats and advantages</li>
+                        <li>Build strategic AI partnerships</li>
+                        <li>Plan for emerging AI technologies</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="maturity-assessment">
+                <h3>AI Maturity Assessment</h3>
+                <p style="text-align: center; color: var(--secondary-text); margin-bottom: 30px;">Evaluate your organization's current AI maturity level across key dimensions</p>
+                
+                <div class="maturity-chart" id="maturityChart"></div>
+                
+                <div class="maturity-levels">
+                    <div class="maturity-level">
+                        <div class="level-number">1</div>
+                        <h4>Initial</h4>
+                        <p>Ad-hoc AI experiments, limited data capabilities, minimal governance</p>
+                    </div>
+                    
+                    <div class="maturity-level">
+                        <div class="level-number">2</div>
+                        <h4>Developing</h4>
+                        <p>Defined AI strategy, basic data infrastructure, pilot projects underway</p>
+                    </div>
+                    
+                    <div class="maturity-level">
+                        <div class="level-number">3</div>
+                        <h4>Defined</h4>
+                        <p>Established AI processes, integrated data platforms, scaling pilots</p>
+                    </div>
+                    
+                    <div class="maturity-level">
+                        <div class="level-number">4</div>
+                        <h4>Managed</h4>
+                        <p>Comprehensive AI governance, enterprise-wide deployment, measurable ROI</p>
+                    </div>
+                    
+                    <div class="maturity-level">
+                        <div class="level-number">5</div>
+                        <h4>Optimizing</h4>
+                        <p>AI-driven innovation, industry leadership, continuous improvement</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 style="text-align: center; font-family: var(--font-heading); font-size: 44px; color: var(--deep); margin-bottom: 60px;">AI Governance Framework</h2>
+            
+            <div class="governance-framework">
+                <div class="governance-card">
+                    <h3>Organizational Structure</h3>
+                    <ul>
+                        <li>AI Steering Committee and Leadership</li>
+                        <li>Center of Excellence (CoE) Establishment</li>
+                        <li>Cross-functional AI Teams</li>
+                        <li>Business Unit AI Champions</li>
+                        <li>External Advisory Board</li>
+                        <li>Clear Roles and Responsibilities</li>
+                        <li>Decision-Making Authority Matrix</li>
+                        <li>Budget Allocation and Control</li>
+                    </ul>
+                </div>
+
+                <div class="governance-card">
+                    <h3>Risk Management & Compliance</h3>
+                    <ul>
+                        <li>AI Ethics and Responsible AI Guidelines</li>
+                        <li>Data Privacy and Security Standards</li>
+                        <li>Model Validation and Testing Protocols</li>
+                        <li>Audit and Compliance Frameworks</li>
+                        <li>Incident Response and Escalation</li>
+                        <li>Regulatory Compliance Monitoring</li>
+                        <li>Intellectual Property Protection</li>
+                        <li>Vendor Risk Assessment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 style="text-align: center; font-family: var(--font-heading); font-size: 44px; color: var(--deep); margin-bottom: 60px;">Scaling Success Metrics</h2>
+            
+            <div class="success-metrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📈</div>
+                    <h4>Business Impact</h4>
+                    <div class="metric-value">+35%</div>
+                    <p>Revenue growth from AI initiatives</p>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <h4>Operational Efficiency</h4>
+                    <div class="metric-value">-42%</div>
+                    <p>Process time reduction</p>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <h4>Cost Savings</h4>
+                    <div class="metric-value">$2.3M</div>
+                    <p>Annual cost reduction</p>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <h4>Decision Speed</h4>
+                    <div class="metric-value">-67%</div>
+                    <p>Time to decision</p>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">😊</div>
+                    <h4>Customer Satisfaction</h4>
+                    <div class="metric-value">+28%</div>
+                    <p>NPS improvement</p>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">🚀</div>
+                    <h4>Innovation Rate</h4>
+                    <div class="metric-value">+156%</div>
+                    <p>New product features</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section challenges-section">
+        <div class="container">
+            <h2 style="text-align: center; font-family: var(--font-heading); font-size: 44px; color: var(--deep); margin-bottom: 60px;">Scaling Challenges & Solutions</h2>
+            
+            <div class="challenges-grid">
+                <div class="challenge-card">
+                    <div class="challenge-icon">🏢</div>
+                    <h4>Organizational Resistance</h4>
+                    <p>Cultural resistance to AI adoption and fear of job displacement across the organization.</p>
+                    <div class="solution-list">
+                        <h5>Solutions:</h5>
+                        <ul>
+                            <li>Comprehensive change management program</li>
+                            <li>Clear communication about AI benefits</li>
+                            <li>Reskilling and upskilling initiatives</li>
+                            <li>Employee involvement in AI design</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-icon">💾</div>
+                    <h4>Data Infrastructure</h4>
+                    <p>Inadequate data infrastructure to support enterprise-wide AI scaling requirements.</p>
+                    <div class="solution-list">
+                        <h5>Solutions:</h5>
+                        <ul>
+                            <li>Modern data architecture implementation</li>
+                            <li>Cloud-native infrastructure adoption</li>
+                            <li>Data quality and governance frameworks</li>
+                            <li>Scalable storage and processing solutions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-icon">👨‍💼</div>
+                    <h4>Talent Shortage</h4>
+                    <p>Lack of AI expertise and skilled professionals to support scaling initiatives.</p>
+                    <div class="solution-list">
+                        <h5>Solutions:</h5>
+                        <ul>
+                            <li>Internal talent development programs</li>
+                            <li>Strategic hiring and partnerships</li>
+                            <li>AI-as-a-Service solutions</li>
+                            <li>Cross-functional team development</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-icon">🔒</div>
+                    <h4>Security & Compliance</h4>
+                    <p>Maintaining security and compliance standards while scaling AI across the organization.</p>
+                    <div class="solution-list">
+                        <h5>Solutions:</h5>
+                        <ul>
+                            <li>Enterprise security framework</li>
+                            <li>Automated compliance monitoring</li>
+                            <li>Privacy-preserving AI techniques</li>
+                            <li>Regular security audits and updates</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-icon">⚡</div>
+                    <h4>Performance at Scale</h4>
+                    <p>Maintaining AI system performance and reliability as usage scales across the organization.</p>
+                    <div class="solution-list">
+                        <h5>Solutions:</h5>
+                        <ul>
+                            <li>Scalable architecture design</li>
+                            <li>Performance monitoring and optimization</li>
+                            <li>Load balancing and auto-scaling</li>
+                            <li>Continuous model improvement</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="challenge-card">
+                    <div class="challenge-icon">💰</div>
+                    <h4>Budget & ROI Management</h4>
+                    <p>Managing large-scale AI investments and demonstrating clear return on investment.</p>
+                    <div class="solution-list">
+                        <h5>Solutions:</h5>
+                        <ul>
+                            <li>Phased investment approach</li>
+                            <li>Clear ROI measurement frameworks</li>
+                            <li>Regular performance reviews</li>
+                            <li>Value realization tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 style="text-align: center; font-family: var(--font-heading); font-size: 44px; color: var(--deep); margin-bottom: 60px;">Best Practices for AI Scaling</h2>
+            
+            <div class="governance-framework">
+                <div class="governance-card">
+                    <h3>Strategic Approach</h3>
+                    <ul>
+                        <li>Start with high-impact, low-risk use cases</li>
+                        <li>Build on successful pilot projects</li>
+                        <li>Maintain focus on business value creation</li>
+                        <li>Ensure executive sponsorship and support</li>
+                        <li>Develop clear communication strategies</li>
+                        <li>Establish measurable success criteria</li>
+                        <li>Plan for both short-term wins and long-term vision</li>
+                        <li>Regular strategy review and adjustment</li>
+                    </ul>
+                </div>
+
+                <div class="governance-card">
+                    <h3>Operational Excellence</h3>
+                    <ul>
+                        <li>Implement robust project management</li>
+                        <li>Establish clear governance structures</li>
+                        <li>Invest in quality data infrastructure</li>
+                        <li>Develop internal AI expertise</li>
+                        <li>Create reusable AI components and platforms</li>
+                        <li>Implement continuous monitoring and improvement</li>
+                        <li>Foster collaboration across business units</li>
+                        <li>Build sustainable operational models</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Scale AI Across Your Organization?</h2>
+            <p>Get expert guidance to develop and execute your enterprise-wide AI scaling strategy.</p>
+            <a href="index.html#contact" class="btn-primary">Develop Your Scaling Strategy</a>
+        </div>
+    </section>
+
+    <footer style="background: var(--light); text-align: center; padding: 40px 0; border-top: 1px solid var(--border);">
+        <div class="container">
+            <p style="color: var(--secondary-text); font-size: 14px;">
+                © Adenola Adegbesan - The AI Maverick | Strategic AI Clarity for Cross-Market Growth
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize maturity radar chart
+        const chartDom = document.getElementById('maturityChart');
+        const myChart = echarts.init(chartDom);
+        
+        const option = {
+            title: {
+                text: 'AI Maturity Assessment Framework',
+                left: 'center',
+                textStyle: {
+                    color: '#0B1B3A',
+                    fontSize: 18,
+                    fontWeight: 'bold'
+                }
+            },
+            tooltip: {},
+            legend: {
+                data: ['Current State', 'Target State'],
+                bottom: 10
+            },
+            radar: {
+                indicator: [
+                    { name: 'Strategy & Vision', max: 100 },
+                    { name: 'Data & Infrastructure', max: 100 },
+                    { name: 'Technology & Tools', max: 100 },
+                    { name: 'Skills & Talent', max: 100 },
+                    { name: 'Governance & Ethics', max: 100 },
+                    { name: 'Business Impact', max: 100 },
+                    { name: 'Innovation Culture', max: 100 },
+                    { name: 'Operational Excellence', max: 100 }
+                ],
+                shape: 'polygon',
+                splitNumber: 4,
+                axisName: {
+                    color: '#0B1B3A',
+                    fontSize: 12
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#E5E7EB'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['rgba(201, 164, 74, 0.1)', 'rgba(201, 164, 74, 0.05)']
+                    }
+                }
+            },
+            series: [{
+                name: 'AI Maturity',
+                type: 'radar',
+                data: [
+                    {
+                        value: [45, 60, 55, 40, 35, 50, 30, 45],
+                        name: 'Current State',
+                        itemStyle: {
+                            color: '#0B1B3A'
+                        },
+                        areaStyle: {
+                            color: 'rgba(11, 27, 58, 0.2)'
+                        }
+                    },
+                    {
+                        value: [90, 85, 90, 80, 85, 85, 75, 85],
+                        name: 'Target State',
+                        itemStyle: {
+                            color: '#C9A44A'
+                        },
+                        areaStyle: {
+                            color: 'rgba(201, 164, 74, 0.3)'
+                        }
+                    }
+                ]
+            }]
+        };
+        
+        myChart.setOption(option);
+        
+        // Make chart responsive
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>
