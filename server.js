@@ -1,3 +1,10 @@
+/**
+ * =================================================
+ * PRODUCTION-READY EXPRESS SERVER
+ * Safe for Render / Railway Deployment
+ * =================================================
+ */
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -5,68 +12,98 @@ const nodemailer = require('nodemailer');
 const { OpenAI } = require('openai');
 const path = require('path');
 
-require('dotenv').config();
+/**
+ * -------------------------------------------------
+ * ENV CONFIG (LOCAL ONLY)
+ * -------------------------------------------------
+ */
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
+/**
+ * -------------------------------------------------
+ * APP INIT
+ * -------------------------------------------------
+ */
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* -------------------------------------------------
-   MIDDLEWARE
-------------------------------------------------- */
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+/**
+ * -------------------------------------------------
+ * MIDDLEWARE
+ * -------------------------------------------------
+ */
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+}));
 
-/* -------------------------------------------------
-   OPENAI CONFIG
-------------------------------------------------- */
+app.use(bodyParser.json({ limit: '2mb' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve static frontend
+app.use(express.static(path.join(__dirname, 'public')));
+
+/**
+ * -------------------------------------------------
+ * OPENAI CONFIG
+ * -------------------------------------------------
+ */
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
-/* -------------------------------------------------
-   EMAIL CONFIG
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * EMAIL CONFIG (GMAIL APP PASSWORD)
+ * -------------------------------------------------
+ */
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
+        pass: process.env.EMAIL_PASS,
+    },
 });
 
-/* -------------------------------------------------
-   REPORT TEMPLATES
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * REPORT TEMPLATES
+ * -------------------------------------------------
+ */
 const reportTemplates = {
     Exploring: {
-        focus: "Identifying high-impact AI opportunities and readiness gaps"
+        focus: "Identifying high-impact AI opportunities and readiness gaps",
     },
     Planning: {
-        focus: "Building a structured and executable AI roadmap"
+        focus: "Building a structured and executable AI roadmap",
     },
     Implementing: {
-        focus: "Optimizing active AI initiatives and scaling impact"
+        focus: "Optimizing active AI initiatives and scaling impact",
     },
     Scaling: {
-        focus: "Enterprise-wide AI transformation and competitive advantage"
-    }
+        focus: "Enterprise-wide AI transformation and competitive advantage",
+    },
 };
 
-/* -------------------------------------------------
-   MARKET INSIGHTS
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * MARKET INSIGHTS
+ * -------------------------------------------------
+ */
 const marketInsights = {
     Nigeria: "Rapidly growing tech ecosystem with mobile-first opportunities and infrastructure constraints.",
     "United Kingdom": "Highly regulated AI environment with strong compliance and governance requirements.",
     "United States": "Advanced AI market with strong competition and innovation velocity.",
-    Multiple: "Cross-market complexity requiring adaptable AI governance and architecture."
+    Multiple: "Cross-market complexity requiring adaptable AI governance and architecture.",
 };
 
-/* -------------------------------------------------
-   AI REPORT GENERATOR (USES 8 ANSWERS)
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * AI REPORT GENERATOR
+ * -------------------------------------------------
+ */
 async function generateAIReport(userData) {
     try {
         const template = reportTemplates[userData.businessStage];
@@ -111,12 +148,12 @@ ${userData.q7_budget}
 8. Success measurement and risk tolerance:
 ${userData.q8_success}
 
-Required Output Structure (use clear section titles):
+Required Output Structure:
 
 Executive Summary  
 Current AI Readiness Assessment  
 Key Market Opportunities  
-Strategic Recommendations (5–7 highly specific actions)  
+Strategic Recommendations (5–7 specific actions)  
 30–60–90 Day Execution Plan  
 Risk & Governance Considerations  
 Success Metrics & KPIs  
@@ -127,89 +164,76 @@ Clear Next Steps for Leadership
             model: "gpt-4o-mini",
             messages: [
                 { role: "system", content: "You are a senior AI strategy advisor." },
-                { role: "user", content: prompt }
+                { role: "user", content: prompt },
             ],
+            temperature: 0.65,
             max_tokens: 3000,
-            temperature: 0.65
         });
 
         return completion.choices[0].message.content;
 
     } catch (error) {
-        console.error("Report Error:", error);
-        return "AI report generation failed.";
+        console.error("AI REPORT ERROR:", error);
+        return "AI report generation failed. Please try again later.";
     }
 }
 
-/* -------------------------------------------------
-   LEAD SUBMISSION ENDPOINT
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * LEAD SUBMISSION ENDPOINT
+ * -------------------------------------------------
+ */
 app.post('/api/lead-submission', async (req, res) => {
     try {
-        const {
-            fullName,
-            email,
-            country,
-            businessStage,
-            q1_problem,
-            q2_owner,
-            q3_data,
-            q4_tech,
-            q5_risk,
-            q6_capability,
-            q7_budget,
-            q8_success
-        } = req.body;
+        const requiredFields = [
+            "fullName",
+            "email",
+            "country",
+            "businessStage",
+            "q1_problem",
+            "q2_owner",
+            "q3_data",
+            "q4_tech",
+            "q5_risk",
+            "q6_capability",
+            "q7_budget",
+            "q8_success",
+        ];
 
-        if (
-            !fullName || !email || !country || !businessStage ||
-            !q1_problem || !q2_owner || !q3_data || !q4_tech ||
-            !q5_risk || !q6_capability || !q7_budget || !q8_success
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "All assessment fields are required."
-            });
+        for (const field of requiredFields) {
+            if (!req.body[field]) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Missing field: ${field}`,
+                });
+            }
         }
 
-        const userData = {
-            fullName,
-            email,
-            country,
-            businessStage,
-            q1_problem,
-            q2_owner,
-            q3_data,
-            q4_tech,
-            q5_risk,
-            q6_capability,
-            q7_budget,
-            q8_success
-        };
-
-        const report = await generateAIReport(userData);
+        const report = await generateAIReport(req.body);
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: email,
-            subject: `Your Strategic AI Clarity Report`,
-            html: `<pre style="white-space: pre-wrap; font-family: Arial;">${report}</pre>`
+            to: req.body.email,
+            subject: "Your Strategic AI Clarity Report",
+            html: `<pre style="white-space: pre-wrap; font-family: Arial;">${report}</pre>`,
         });
 
-        res.json({ success: true });
+        res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error("Lead Submission Error:", error);
+        console.error("LEAD SUBMISSION ERROR:", error);
         res.status(500).json({
             success: false,
-            message: "Server error while generating report."
+            message: "Server error while generating report.",
         });
     }
 });
 
-/* -------------------------------------------------
-   NEWSLETTER
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * NEWSLETTER SUBSCRIPTION
+ * -------------------------------------------------
+ */
 app.post('/api/newsletter', async (req, res) => {
     try {
         const { email } = req.body;
@@ -217,65 +241,53 @@ app.post('/api/newsletter', async (req, res) => {
         if (!email) {
             return res.status(400).json({
                 success: false,
-                message: "Email is required"
+                message: "Email is required",
             });
         }
 
-        // Send welcome email to subscriber
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Welcome to AI Maverick Insights",
             html: `
                 <h2>Welcome to AI Maverick Insights</h2>
-                <p>You have successfully subscribed to our newsletter.</p>
+                <p>You have successfully subscribed.</p>
                 <p>Expect practical AI strategy insights and market updates.</p>
-            `
+            `,
         });
 
-        // Notify site owner
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
             subject: "New Newsletter Subscriber",
-            html: `
-                <p>A new user has subscribed to the newsletter:</p>
-                <strong>${email}</strong>
-            `
+            html: `<strong>${email}</strong> just subscribed.`,
         });
-
-        console.log(`New newsletter subscriber: ${email}`);
 
         res.status(200).json({ success: true });
 
     } catch (error) {
         console.error("NEWSLETTER ERROR:", error);
-
         res.status(500).json({
             success: false,
-            message: "Failed to process newsletter subscription"
+            message: "Failed to process newsletter subscription",
         });
     }
 });
 
-
-/* -------------------------------------------------
-   HEALTH CHECK
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * HEALTH CHECK
+ * -------------------------------------------------
+ */
 app.get('/api/health', (req, res) => {
     res.json({ success: true, status: "OK" });
 });
 
-/* -------------------------------------------------
-   ROOT
-------------------------------------------------- */
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-/* -------------------------------------------------
-   START SERVER
-------------------------------------------------- */
+/**
+ * -------------------------------------------------
+ * START SERVER
+ * -------------------------------------------------
+ */
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
