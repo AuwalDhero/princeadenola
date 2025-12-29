@@ -1292,6 +1292,27 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* Fix Quiz Options visibility */
+.quiz-option {
+    background: rgba(11, 27, 58, 0.7); /* Darker background so white text is visible */
+    border: 1px solid var(--gold);
+    color: #FFFFFF !important;
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding: 15px;
+    text-align: left;
+}
+
+.quiz-option:hover {
+    background: var(--gold);
+    color: var(--deep) !important;
+}
+
+.quiz-option.selected {
+    background: var(--gold);
+    color: var(--deep) !important;
+    border-color: #fff;
+}
 
 
 
@@ -1351,253 +1372,124 @@ body {
                     </div>
                 </div>
             </div>
+
             <div class="hero-form">
-
-                <!-- FORM HEADER -->
                 <div class="form-header">
-                  <h3 class="form-title">AI Strategy Assessment</h3>
-                  <p class="form-subtitle">
-                    Obtain your bespoke Strategic AI Clarity Report
-                  </p>
+                    <h3 class="form-title">AI Strategy Assessment</h3>
+                    <p class="form-subtitle">Obtain your bespoke Strategic AI Clarity Report</p>
                 </div>
               
-                <!-- PROGRESS BAR -->
                 <div class="progress-bar">
-                  <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
               
-                <!-- FORM -->
                 <form id="leadForm">
-              
-                  <!-- STEP 1 -->
-                  <div class="form-step active" data-step="1">
-                    <div class="form-group">
-                      <label for="fullName">Complete Name</label>
-                      <input type="text" id="fullName" name="fullName" required>
+                    <div class="form-step active" data-step="1">
+                        <div class="form-group">
+                            <label for="fullName">Complete Name</label>
+                            <input type="text" id="fullName" name="fullName" placeholder="Enter name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="email@company.com" required>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="nextStep()">Proceed</button>
                     </div>
               
-                    <div class="form-group">
-                      <label for="email">Email Address</label>
-                      <input type="email" id="email" name="email" required>
+                    <div class="form-step" data-step="2">
+                        <div class="form-group">
+                            <label for="country">Primary Market</label>
+                            <select id="country" name="country" required>
+                                <option value="">Select your market</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="United States">United States</option>
+                                <option value="Multiple">Multiple Markets</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="businessStage">Current AI Stage</label>
+                            <select id="businessStage" name="businessStage" required>
+                                <option value="">Select stage</option>
+                                <option value="Exploring">Exploring AI</option>
+                                <option value="Planning">Planning AI</option>
+                                <option value="Implementing">Implementing AI</option>
+                                <option value="Scaling">Scaling AI</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="nextStep()">Continue</button>
                     </div>
               
-                    <button type="button" class="btn-primary" onclick="nextStep()">
-                      Proceed
-                    </button>
-                  </div>
-              
-                  <!-- STEP 2 -->
-                  <div class="form-step" data-step="2">
-                    <div class="form-group">
-                      <label for="country">Primary Market</label>
-                      <select id="country" name="country" required>
-                        <option value="">Select your market</option>
-                        <option value="Nigeria">Nigeria</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="United States">United States</option>
-                        <option value="Multiple">Multiple Markets</option>
-                      </select>
-                    </div>
-              
-                    <div class="form-group">
-                      <label for="businessStage">Current AI Stage</label>
-                      <select id="businessStage" name="businessStage" required>
-                        <option value="">Select stage</option>
-                        <option value="Exploring">Exploring AI</option>
-                        <option value="Planning">Planning AI</option>
-                        <option value="Implementing">Implementing AI</option>
-                        <option value="Scaling">Scaling AI</option>
-                      </select>
-                    </div>
-              
-                    <button type="button" class="btn-primary" onclick="nextStep()">
-                      Continue
-                    </button>
-                  </div>
-              
-                  <!-- STEP 3 -->
-                  <div class="form-step" data-step="3">
-                    <div class="form-group">
-                      <label>
-                        1. What specific business problem or opportunity do you want AI to address?
-                      </label>
-                      <select id="q1_problem" required>
-                        <option value="">Select one</option>
-                        <option>Efficiency & cost reduction</option>
-                        <option>Revenue growth</option>
-                        <option>Customer experience</option>
-                        <option>Risk reduction & compliance</option>
-                        <option>Innovation & new products</option>
-                      </select>
-                    </div>
-              
-                    <div class="form-group">
-                      <label>
-                        2. Who owns and sponsors this AI initiative?
-                      </label>
-                      <select id="q2_owner" required>
-                        <option value="">Select one</option>
-                        <option>CEO / Founder</option>
-                        <option>CTO / CIO</option>
-                        <option>Board / Executive leadership</option>
-                        <option>Department head</option>
-                        <option>No clear owner yet</option>
-                      </select>
-                    </div>
-              
-                    <button type="button" class="btn-primary" onclick="nextStep()">
-                      Continue
-                    </button>
-                  </div>
-              
-                  <!-- STEP 4 -->
-                  <div class="form-step" data-step="4">
-                    <div class="form-group">
-                      <label>
-                        3. What data do you currently have and how well is it governed?
-                      </label>
-                      <select id="q3_data" required>
-                        <option value="">Select one</option>
-                        <option>High-quality data with strong governance</option>
-                        <option>Some usable data, weak governance</option>
-                        <option>Fragmented or siloed data</option>
-                        <option>Very limited usable data</option>
-                      </select>
-                    </div>
-              
-                    <div class="form-group">
-                      <label>
-                        4. What is your current technology & infrastructure readiness?
-                      </label>
-                      <select id="q4_tech" required>
-                        <option value="">Select one</option>
-                        <option>Cloud-based and well integrated</option>
-                        <option>Mostly digital with some legacy systems</option>
-                        <option>Heavy legacy infrastructure</option>
-                        <option>Low digital maturity</option>
-                      </select>
-                    </div>
-              
-                    <button type="button" class="btn-primary" onclick="nextStep()">
-                      Continue
-                    </button>
-                  </div>
-              
-                  <!-- STEP 5 -->
-                  <div class="form-step" data-step="5">
-                    <div class="form-group">
-                      <label>
-                        5. Have you considered regulatory, legal & ethical AI risks?
-                      </label>
-                      <select id="q5_risk" required>
-                        <option value="">Select one</option>
-                        <option>Yes, clearly addressed</option>
-                        <option>Partially considered</option>
-                        <option>Not yet considered</option>
-                      </select>
-                    </div>
-              
-                    <div class="form-group">
-                      <label>
-                        6. What level of AI capability exists today?
-                      </label>
-                      <select id="q6_capability" required>
-                        <option value="">Select one</option>
-                        <option>No AI usage</option>
-                        <option>Basic tools (ChatGPT, automation)</option>
-                        <option>Analytics & workflow automation</option>
-                        <option>Advanced AI / ML systems</option>
-                      </select>
-                    </div>
-              
-                    <button type="button" class="btn-primary" onclick="nextStep()">
-                      Continue
-                    </button>
-                  </div>
-              
-                  <!-- STEP 6 -->
-                  <div class="form-step" data-step="6">
-                    <div class="form-group">
-                      <label>
-                        7. Do you have the budget, talent & change capacity for AI?
-                      </label>
-                      <select id="q7_budget" required>
-                        <option value="">Select one</option>
-                        <option>Yes, fully ready</option>
-                        <option>Partial budget or skills</option>
-                        <option>Limited capacity</option>
-                      </select>
-                    </div>
-              
-                    <div class="form-group">
-                      <label>
-                        8. How will you measure success and tolerate experimentation?
-                      </label>
-                      <select id="q8_success" required>
-                        <option value="">Select one</option>
-                        <option>Clear KPIs & ROI targets</option>
-                        <option>Some KPIs, flexible goals</option>
-                        <option>No clear success metrics</option>
-                      </select>
-                    </div>
-              
-                    <button type="submit" class="btn-primary" id="submitBtn">
-                        GENERATE MY AI STRATEGY REPORT
-                      </button>
-                    
-                      </div>
-                      
-                      
-                  </div>
-
-              
-                </form>
-                <p id="formMessage" style="display:none; margin-top:15px; font-weight:600;"></p>
-                      <div id="thankYouState" style="display:none; text-align:center; padding:40px 20px;">
-                        <h2 style="
-                            font-weight:800;
-                            font-size:26px;
-                            color:#C9A227;
-                            margin-bottom:20px;
-                        ">
-                          Thank you. Your AI Strategy Report has been sent to your email.
-                        </h2>
-                      
-                        <p style="
-                            font-size:18px;
-                            font-weight:700;
-                            color:#c2d871;
-                            margin-bottom:25px;
-                        ">
-                          Book a consultation with <strong>Adenola Adegbesan — The AI Maverick</strong> for clarity.
-                        </p>
-                      
-                        <a href="https://selar.com/showlove/prince-adenola-adegbesan" class="btn-primary" style="
-                            background: linear-gradient(135deg, #b8aa7f, #E6C15A);
-                            color:#000;
-                            font-weight:700;
-                            padding:14px 28px;
-                            border-radius:8px;
-                            text-decoration:none;
-                            display:inline-block;
-                        ">
-                          BOOK A CONSULTATION
-                        </a>
-              </div>
-              
-
                     <div class="form-step" data-step="3">
-                        <div class="form-success">
-                            <h3>Strategic AI Report Sent!</h3>
-                            <p>Your personalized Strategic AI Clarity Report is on its way. Check your email in the next few minutes.</p>
+                        <label class="quiz-question-label">Who owns and sponsors this AI initiative?</label>
+                        <input type="hidden" id="q2_owner" required>
+                        <div class="quiz-options-container">
+                            <div class="quiz-option">CEO / Founder</div>
+                            <div class="quiz-option">CTO / CIO</div>
+                            <div class="quiz-option">Board / Executive</div>
+                            <div class="quiz-option">No clear owner yet</div>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="nextStep()" style="margin-top:15px;">Continue</button>
+                    </div>
+              
+                    <div class="form-step" data-step="4">
+                        <label class="quiz-question-label">What data quality/governance level do you have?</label>
+                        <input type="hidden" id="q3_data" required>
+                        <div class="quiz-options-container">
+                            <div class="quiz-option">High-quality & Governed</div>
+                            <div class="quiz-option">Fragmented / Siloed</div>
+                            <div class="quiz-option">Very Limited</div>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="nextStep()" style="margin-top:15px;">Continue</button>
+                    </div>
+              
+                    <div class="form-step" data-step="5">
+                        <label class="quiz-question-label">What is your current AI capability?</label>
+                        <input type="hidden" id="q6_capability" required>
+                        <div class="quiz-options-container">
+                            <div class="quiz-option">Advanced AI/ML Systems</div>
+                            <div class="quiz-option">Basic Automation/ChatGPT</div>
+                            <div class="quiz-option">No AI usage yet</div>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="nextStep()" style="margin-top:15px;">Continue</button>
+                    </div>
+              
+                    <div class="form-step" data-step="6">
+                        <label class="quiz-question-label">Do you have the budget & talent for AI?</label>
+                        <input type="hidden" id="q7_budget" required>
+                        <div class="quiz-options-container">
+                            <div class="quiz-option">Yes, fully ready</div>
+                            <div class="quiz-option">Partial budget/skills</div>
+                            <div class="quiz-option">Limited capacity</div>
+                        </div>
+                        <button type="submit" class="btn-primary" id="submitBtn" style="margin-top:20px;">
+                            GENERATE MY AI STRATEGY REPORT
+                        </button>
+                    </div>
+                </form>
+
+                <div id="resultState" style="display:none; text-align:center; padding:30px 20px;">
+                    <div style="position: relative; width: 150px; height: 150px; margin: 0 auto 20px;">
+                        <svg viewBox="0 0 36 36" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="3" />
+                            <path id="scoreRing" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#C9A44A" stroke-width="3" stroke-dasharray="0, 100" />
+                        </svg>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <span id="scorePercentage" style="font-size: 32px; font-weight: 700; color: #0B1B3A;">0%</span>
+                            <div style="font-size: 10px; text-transform: uppercase; color: #64748B; font-weight: 600;">Readiness</div>
                         </div>
                     </div>
-                </form>
+                    <h3 id="resultTitle" style="font-size: 24px; color: #0B1B3A; margin-bottom: 10px;">Analyzing...</h3>
+                    <p id="resultMessage" style="font-size: 15px; color: #64748B; margin-bottom: 25px; line-height: 1.5;"></p>
+                    <a href="https://selar.com/showlove/prince-adenola-adegbesan" class="btn-primary" style="text-decoration:none; display:inline-block;">
+                        BOOK A CLARITY CALL
+                    </a>
+                </div>
+                <p id="formMessage" style="display:none; margin-top:15px; font-weight:600; text-align:center;"></p>
             </div>
         </div>
     </div>
 </section>
-
 <!-- Problem Section -->
 <section class="section">
     <div class="container">
@@ -1926,7 +1818,7 @@ body {
                 <i class="fas fa-envelope"></i> info@adenolaadegbesan.co.uk
             </a>
             <a href="tel:+2348112698170" class="footer-contact-item" aria-label="Call Adenola Adegbesan">
-                <i class="fas fa-phone"></i> +234 811 269 8170
+                <i class="fas fa-phone"></i> +447432529090
             </a>
         </div>
 

@@ -1,7 +1,7 @@
 /**
  * =================================================
  * PRODUCTION-READY EXPRESS SERVER
- * Safe for Render / Railway Deployment
+ * Optimized for AI Readiness Assessment
  * =================================================
  */
 
@@ -9,268 +9,125 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
-const { OpenAI } = require('openai');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 /**
  * -------------------------------------------------
- * ENV CONFIG (LOCAL ONLY)
+ * ENV CONFIG
  * -------------------------------------------------
  */
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 
-/**
- * -------------------------------------------------
- * APP INIT
- * -------------------------------------------------
- */
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 /**
  * -------------------------------------------------
- * MIDDLEWARE
+ * MIDDLEWARE & SECURITY
  * -------------------------------------------------
  */
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-}));
-
-app.use(bodyParser.json({ limit: '2mb' }));
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Serve static frontend
+app.use(cors({ origin: "*" }));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-/**
- * -------------------------------------------------
- * OPENAI CONFIG
- * -------------------------------------------------
- */
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+// Protect against spam: Max 5 submissions per 15 minutes per IP
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 5,
+    message: { success: false, message: "Too many requests. Please try again later." }
 });
 
 /**
  * -------------------------------------------------
- * EMAIL CONFIG (GMAIL APP PASSWORD)
+ * EMAIL TRANSPORTER
  * -------------------------------------------------
  */
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_PASS, // Use Gmail App Password
     },
 });
 
 /**
  * -------------------------------------------------
- * REPORT TEMPLATES
+ * LEAD SUBMISSION ENDPOINT (Email PDF + Score)
  * -------------------------------------------------
  */
-const reportTemplates = {
-    Exploring: {
-        focus: "Identifying high-impact AI opportunities and readiness gaps",
-    },
-    Planning: {
-        focus: "Building a structured and executable AI roadmap",
-    },
-    Implementing: {
-        focus: "Optimizing active AI initiatives and scaling impact",
-    },
-    Scaling: {
-        focus: "Enterprise-wide AI transformation and competitive advantage",
-    },
-};
-
-/**
- * -------------------------------------------------
- * MARKET INSIGHTS
- * -------------------------------------------------
- */
-const marketInsights = {
-    Nigeria: "Rapidly growing tech ecosystem with mobile-first opportunities and infrastructure constraints.",
-    "United Kingdom": "Highly regulated AI environment with strong compliance and governance requirements.",
-    "United States": "Advanced AI market with strong competition and innovation velocity.",
-    Multiple: "Cross-market complexity requiring adaptable AI governance and architecture.",
-};
-
-/**
- * -------------------------------------------------
- * AI REPORT GENERATOR
- * -------------------------------------------------
- */
-async function generateAIReport(userData) {
+app.post('/api/lead-submission', limiter, async (req, res) => {
     try {
-        const template = reportTemplates[userData.businessStage];
-        const marketInsight = marketInsights[userData.country];
+        const { email, fullName, readinessScore } = req.body;
 
-        const prompt = `
-You are Adenola Adegbesan, The AI Maverick.
-
-Create a clear, practical, executive-level AI strategy report based strictly on the information below.
-Write in confident, human, advisory language — not generic AI tone.
-
-Client Profile
-Name: ${userData.fullName}
-Primary Market: ${userData.country}
-Business Stage: ${userData.businessStage}
-Market Context: ${marketInsight}
-Strategic Focus: ${template.focus}
-
-AI Strategy Assessment Responses
-
-1. Business problem or opportunity AI should address:
-${userData.q1_problem}
-
-2. Executive ownership of AI initiative:
-${userData.q2_owner}
-
-3. Current data availability and governance:
-${userData.q3_data}
-
-4. Technology and infrastructure readiness:
-${userData.q4_tech}
-
-5. Regulatory, legal, and ethical considerations:
-${userData.q5_risk}
-
-6. Existing AI capability within the organization:
-${userData.q6_capability}
-
-7. Budget, talent, and change management capacity:
-${userData.q7_budget}
-
-8. Success measurement and risk tolerance:
-${userData.q8_success}
-
-Required Output Structure:
-
-Executive Summary  
-Current AI Readiness Assessment  
-Key Market Opportunities  
-Strategic Recommendations (5–7 specific actions)  
-30–60–90 Day Execution Plan  
-Risk & Governance Considerations  
-Success Metrics & KPIs  
-Clear Next Steps for Leadership
-`;
-
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: "You are a senior AI strategy advisor." },
-                { role: "user", content: prompt },
-            ],
-            temperature: 0.65,
-            max_tokens: 3000,
-        });
-
-        return completion.choices[0].message.content;
-
-    } catch (error) {
-        console.error("AI REPORT ERROR:", error);
-        return "AI report generation failed. Please try again later.";
-    }
-}
-
-/**
- * -------------------------------------------------
- * LEAD SUBMISSION ENDPOINT
- * -------------------------------------------------
- */
-app.post('/api/lead-submission', async (req, res) => {
-    try {
-        const requiredFields = [
-            "fullName",
-            "email",
-            "country",
-            "businessStage",
-            "q1_problem",
-            "q2_owner",
-            "q3_data",
-            "q4_tech",
-            "q5_risk",
-            "q6_capability",
-            "q7_budget",
-            "q8_success",
-        ];
-
-        for (const field of requiredFields) {
-            if (!req.body[field]) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Missing field: ${field}`,
-                });
-            }
+        if (!email || !fullName) {
+            return res.status(400).json({ success: false, message: "Missing required info" });
         }
 
-        const report = await generateAIReport(req.body);
+        // CORRECT PATH: Assumes PDF is in public/resources/
+        const pdfPath = path.join(__dirname, 'public', 'resources', 'Strategic-AI-Clarity-Report.pdf');
 
+        // 1. Send Email to the User
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: req.body.email,
-            subject: "Your Strategic AI Clarity Report",
-            html: `<pre style="white-space: pre-wrap; font-family: Arial;">${report}</pre>`,
-        });
-
-        res.status(200).json({ success: true });
-
-    } catch (error) {
-        console.error("LEAD SUBMISSION ERROR:", error);
-        res.status(500).json({
-            success: false,
-            message: "Server error while generating report.",
-        });
-    }
-});
-
-/**
- * -------------------------------------------------
- * NEWSLETTER SUBSCRIPTION
- * -------------------------------------------------
- */
-app.post('/api/newsletter', async (req, res) => {
-    try {
-        const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).json({
-                success: false,
-                message: "Email is required",
-            });
-        }
-
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: `"Adenola Adegbesan" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: "Welcome to AI Maverick Insights",
+            subject: `Your AI Readiness Score: ${readinessScore}%`,
             html: `
-                <h2>Welcome to AI Maverick Insights</h2>
-                <p>You have successfully subscribed.</p>
-                <p>Expect practical AI strategy insights and market updates.</p>
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <h2>Hi ${fullName},</h2>
+                    <p>Thank you for completing the <strong>Strategic AI Readiness Assessment</strong>.</p>
+                    <p>Your current readiness score is: <span style="font-size: 24px; color: #C9A44A; font-weight: bold;">${readinessScore}%</span></p>
+                    <p>I have attached your <strong>Strategic AI Clarity Report</strong>. This document outlines the roadmap needed to navigate your AI transformation.</p>
+                    <br>
+                    <p>Best regards,<br><strong>Adenola Adegbesan</strong><br>The AI Maverick</p>
+                </div>
             `,
+            attachments: [
+                {
+                    filename: 'Strategic-AI-Clarity-Report.pdf',
+                    path: pdfPath 
+                }
+            ]
         });
 
+        // 2. Notify Yourself (Admin Notification)
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
-            subject: "New Newsletter Subscriber",
-            html: `<strong>${email}</strong> just subscribed.`,
+            subject: `🔥 New Lead: ${fullName} (${readinessScore}%)`,
+            html: `<p>New assessment completed by <strong>${fullName}</strong> (${email}). Score: <strong>${readinessScore}%</strong>.</p>`
         });
 
         res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error("NEWSLETTER ERROR:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to process newsletter subscription",
+        console.error("SUBMISSION ERROR:", error);
+        res.status(500).json({ success: false, message: "Failed to send report. Please check if the PDF exists on the server." });
+    }
+});
+
+/**
+ * -------------------------------------------------
+ * NEWSLETTER ENDPOINT
+ * -------------------------------------------------
+ */
+app.post('/api/newsletter', limiter, async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false });
+
+        await transporter.sendMail({
+            from: `"AI Maverick" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Welcome to AI Maverick Insights",
+            html: `<p>You've successfully subscribed to AI strategy insights.</p>`
         });
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false });
     }
 });
 
@@ -280,16 +137,9 @@ app.post('/api/newsletter', async (req, res) => {
  * -------------------------------------------------
  */
 app.get('/api/health', (req, res) => {
-    res.json({ success: true, status: "OK" });
+    res.json({ success: true, status: "OK", timestamp: new Date() });
 });
 
-/**
- * -------------------------------------------------
- * START SERVER
- * -------------------------------------------------
- */
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-module.exports = app;
