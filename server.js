@@ -1,7 +1,7 @@
 /**
  * =================================================
  * PRODUCTION-READY EXPRESS SERVER
- * Optimized for AI Readiness Assessment
+ * Optimized for AI Readiness Assessment & Render
  * =================================================
  */
 
@@ -22,50 +22,42 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; // Updated for Render's default port
 
 /**
  * -------------------------------------------------
  * MIDDLEWARE & SECURITY
  * -------------------------------------------------
  */
-// ... after const app = express();
-
-// 1. ADD THIS LINE: This tells Express it is behind Render's proxy
+// Tell Express to trust Render's proxy for the rate limiter to work
 app.set('trust proxy', 1); 
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Now the limiter will work correctly
+// Protect against spam: Max 5 submissions per 15 minutes per IP
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 5,
     message: { success: false, message: "Too many requests. Please try again later." }
 });
+
 /**
  * -------------------------------------------------
- * EMAIL TRANSPORTER
- * -------------------------------------------------
- */
-/**
- * -------------------------------------------------
- * EMAIL TRANSPORTER (Optimized for Render)
+ * EMAIL TRANSPORTER (Optimized for Cloud Deployment)
  * -------------------------------------------------
  */
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, // true for 465, false for 587
+    secure: false, // Port 587 uses STARTTLS
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, 
+        pass: process.env.EMAIL_PASS, // Ensure this is a 16-character App Password
     },
     tls: {
-        // This helps prevent connection drops on some cloud environments
-        ciphers: 'SSLv3',
-        rejectUnauthorized: false
+        rejectUnauthorized: false // Prevents connection drops in cloud environments
     }
 });
 
@@ -108,7 +100,7 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
             ]
         });
 
-        // 2. Notify Yourself (Admin Notification)
+        // 2. Notify Admin
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
@@ -120,7 +112,7 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
 
     } catch (error) {
         console.error("SUBMISSION ERROR:", error);
-        res.status(500).json({ success: false, message: "Failed to send report. Please check if the PDF exists on the server." });
+        res.status(500).json({ success: false, message: "Server error during processing." });
     }
 });
 
@@ -143,6 +135,7 @@ app.post('/api/newsletter', limiter, async (req, res) => {
 
         res.status(200).json({ success: true });
     } catch (error) {
+        console.error("NEWSLETTER ERROR:", error);
         res.status(500).json({ success: false });
     }
 });
