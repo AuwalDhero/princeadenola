@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const app = express();
-const PORT = process.env.PORT || 10000; // Updated for Render's default port
+const PORT = process.env.PORT || 10000; // Use Render's default or 10000
 
 /**
  * -------------------------------------------------
@@ -45,28 +45,29 @@ const limiter = rateLimit({
 
 /**
  * -------------------------------------------------
- * EMAIL TRANSPORTER (The "Service" Method)
- * This is the most reliable way to bypass cloud timeouts
+ * EMAIL TRANSPORTER (Optimized for Render + Gmail)
  * -------------------------------------------------
  */
-/* -------------------------------------------------
-   EMAIL TRANSPORTER (BREVO CONFIGURATION)
-------------------------------------------------- */
 const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for 587
     auth: {
-        user: process.env.BREVO_USER, // Your Brevo login email
-        pass: process.env.BREVO_PASS, // Your Brevo SMTP Key (NOT your login password)
+        user: process.env.EMAIL_USER, // Your Gmail address
+        pass: process.env.EMAIL_PASS, // Your 16-character App Password
     },
+    // Essential for cloud stability
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     tls: {
         rejectUnauthorized: false
     }
 });
+
 /**
  * -------------------------------------------------
- * LEAD SUBMISSION ENDPOINT (Email PDF + Score)
+ * LEAD SUBMISSION ENDPOINT
  * -------------------------------------------------
  */
 app.post('/api/lead-submission', limiter, async (req, res) => {
@@ -77,10 +78,9 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
             return res.status(400).json({ success: false, message: "Missing required info" });
         }
 
-        // CORRECT PATH: Assumes PDF is in public/resources/
         const pdfPath = path.join(__dirname, 'public', 'resources', 'Strategic-AI-Clarity-Report.pdf');
 
-        // 1. Send Email to the User
+        // 1. Send Report to the User
         await transporter.sendMail({
             from: `"Adenola Adegbesan" <${process.env.EMAIL_USER}>`,
             to: email,
@@ -103,7 +103,7 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
             ]
         });
 
-        // 2. Notify Admin
+        // 2. Internal Admin Notification
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
@@ -115,7 +115,7 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
 
     } catch (error) {
         console.error("SUBMISSION ERROR:", error);
-        res.status(500).json({ success: false, message: "Server error during processing." });
+        res.status(500).json({ success: false, message: "Connection error. Please try again." });
     }
 });
 
