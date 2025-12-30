@@ -29,28 +29,44 @@ const PORT = process.env.PORT || 3000;
  * MIDDLEWARE & SECURITY
  * -------------------------------------------------
  */
+// ... after const app = express();
+
+// 1. ADD THIS LINE: This tells Express it is behind Render's proxy
+app.set('trust proxy', 1); 
+
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Protect against spam: Max 5 submissions per 15 minutes per IP
+// Now the limiter will work correctly
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 5,
     message: { success: false, message: "Too many requests. Please try again later." }
 });
-
 /**
  * -------------------------------------------------
  * EMAIL TRANSPORTER
  * -------------------------------------------------
  */
+/**
+ * -------------------------------------------------
+ * EMAIL TRANSPORTER (Optimized for Render)
+ * -------------------------------------------------
+ */
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for 587
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // Use Gmail App Password
+        pass: process.env.EMAIL_PASS, 
     },
+    tls: {
+        // This helps prevent connection drops on some cloud environments
+        ciphers: 'SSLv3',
+        rejectUnauthorized: false
+    }
 });
 
 /**
