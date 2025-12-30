@@ -50,23 +50,19 @@ const limiter = rateLimit({
  * -------------------------------------------------
  */
 /* -------------------------------------------------
-   EMAIL TRANSPORTER (UPDATED)
+   EMAIL TRANSPORTER (BREVO CONFIGURATION)
 ------------------------------------------------- */
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,  // CHANGE: Switch from 587 to 465
-    secure: true, // CHANGE: Must be true for port 465
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.BREVO_USER, // Your Brevo login email
+        pass: process.env.BREVO_PASS, // Your Brevo SMTP Key (NOT your login password)
     },
     tls: {
-        // Do not fail on invalid certs
-        rejectUnauthorized: false 
-    },
-    // ADDITION: Increase connection timeout
-    connectionTimeout: 10000, 
-    greetingTimeout: 10000 
+        rejectUnauthorized: false
+    }
 });
 /**
  * -------------------------------------------------
