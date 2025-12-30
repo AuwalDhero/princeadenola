@@ -78,7 +78,10 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
             return res.status(400).json({ success: false, message: "Missing required info" });
         }
 
-        const pdfPath = path.join(__dirname, 'public', 'resources', 'Strategic-AI-Clarity-Report.pdf');
+        // OLD: const pdfPath = path.join(__dirname, 'public', 'resources', ...);
+
+            // NEW (Vercel Compatible):
+            const pdfPath = path.join(process.cwd(), 'public', 'resources', 'Strategic-AI-Clarity-Report.pdf');
 
         // 1. Send Report to the User
         await transporter.sendMail({
@@ -152,6 +155,17 @@ app.get('/api/health', (req, res) => {
     res.json({ success: true, status: "OK", timestamp: new Date() });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// OLD CODE:
+// app.listen(PORT, () => {
+//    console.log(`Server running on port ${PORT}`);
+// });
+
+// NEW CODE:
+// Only listen if running locally (for testing), otherwise export for Vercel
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

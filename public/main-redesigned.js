@@ -1,9 +1,12 @@
 /* -------------------------------------------------
    API CONFIG
 ------------------------------------------------- */
-const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
-    ? "http://localhost:3000" 
-    : "https://princeadenola.onrender.com";
+// OLD:
+// const API_BASE = window.location.hostname === ... ? ... : "https://princeadenola.onrender.com";
+
+// NEW (Much simpler):
+const API_BASE = ""; 
+// We use an empty string because the backend is now at /api/lead-submission on the same site.
 /* -------------------------------------------------
    MOBILE NAVIGATION
 ------------------------------------------------- */
