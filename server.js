@@ -45,20 +45,20 @@ const limiter = rateLimit({
 
 /**
  * -------------------------------------------------
- * EMAIL TRANSPORTER (Optimized for Cloud Deployment)
+ * EMAIL TRANSPORTER (The "Service" Method)
+ * This is the most reliable way to bypass cloud timeouts
  * -------------------------------------------------
  */
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // Port 587 uses STARTTLS
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // Ensure this is a 16-character App Password
+        pass: process.env.EMAIL_PASS, 
     },
-    tls: {
-        rejectUnauthorized: false // Prevents connection drops in cloud environments
-    }
+    // We add these timeout settings to give the server more time to respond
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000
 });
 
 /**
