@@ -93,14 +93,28 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
         const pages = pdfDoc.getPages();
         const firstPage = pages[0]; // Edits the first page (Cover)
 
-        // Draw the Client's Name
-        // NOTE: Adjust 'x' and 'y' to position the name perfectly on your specific PDF design
+        // 1. Draw the Client's Name in WHITE
         firstPage.drawText(fullName, {
-            x: 168,        // Horizontal position 
-            y: 538,        // Vertical position (0 is bottom of page)
-            size: 14,      // Font size
+            x: 165,             // Horizontal: Starts right after "Prepared for:"
+            y: 538,             // Vertical: Adjusted to sit on the line
+            size: 14,           
             font: helveticaFont,
-            color: rgb(0.04, 0.11, 0.23), // Dark Navy (#0B1B3A)
+            color: rgb(1, 1, 1), // White
+        });
+
+        // 2. Draw the Current Date in WHITE
+        const currentDate = new Date().toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        
+        firstPage.drawText(currentDate, {
+            x: 125,             // Horizontal: Starts right after "Date:"
+            y: 522,             // Vertical: One line below the name
+            size: 14,
+            font: helveticaFont,
+            color: rgb(1, 1, 1), // White
         });
 
         // 4. Save the modified PDF to a Buffer (RAM)
