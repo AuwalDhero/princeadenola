@@ -95,14 +95,14 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
 
         // 1. Draw the Client's Name in WHITE
         firstPage.drawText(fullName, {
-            x: 165,             // Horizontal: Starts right after "Prepared for:"
-            y: 538,             // Vertical: Adjusted to sit on the line
-            size: 14,           
+            x: 135,             // Positioned right after "Prepared for:"
+            y: 494,             // Lowered to sit exactly on the first line
+            size: 13,           
             font: helveticaFont,
             color: rgb(1, 1, 1), // White
         });
 
-        // 2. Draw the Current Date in WHITE
+        // 2. Prepare and Draw the Date in WHITE
         const currentDate = new Date().toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'long',
@@ -110,13 +110,12 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
         });
         
         firstPage.drawText(currentDate, {
-            x: 125,             // Horizontal: Starts right after "Date:"
-            y: 522,             // Vertical: One line below the name
-            size: 14,
+            x: 85,              // Positioned right after "Date:"
+            y: 471,             // Lowered to sit exactly on the second line
+            size: 13,
             font: helveticaFont,
             color: rgb(1, 1, 1), // White
         });
-
         // 4. Save the modified PDF to a Buffer (RAM)
         const pdfBytes = await pdfDoc.save();
 
