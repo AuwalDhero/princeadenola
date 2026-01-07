@@ -95,8 +95,8 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
 
         // 1. Draw the Client's Name in WHITE
         firstPage.drawText(fullName, {
-            x: 135,             // Positioned right after "Prepared for:"
-            y: 494,             // Lowered to sit exactly on the first line
+            x: 257,             // Positioned right after "Prepared for:"
+            y: 222,             // Lowered to sit exactly on the first line
             size: 13,           
             font: helveticaFont,
             color: rgb(1, 1, 1), // White
@@ -110,8 +110,8 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
         });
         
         firstPage.drawText(currentDate, {
-            x: 85,              // Positioned right after "Date:"
-            y: 471,             // Lowered to sit exactly on the second line
+            x: 225,              // Positioned right after "Date:"
+            y: 201,             // Lowered to sit exactly on the second line
             size: 13,
             font: helveticaFont,
             color: rgb(1, 1, 1), // White
