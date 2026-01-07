@@ -95,7 +95,7 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
 
         // 1. Draw the Client's Name in WHITE
         firstPage.drawText(fullName, {
-            x: 260,             // Positioned right after "Prepared for:"
+            x: 270,             // Positioned right after "Prepared for:"
             y: 222,             // Lowered to sit exactly on the first line
             size: 13,           
             font: helveticaFont,
