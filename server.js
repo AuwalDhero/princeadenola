@@ -11,6 +11,9 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+// NEW: Required for editing the PDF
+const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
+const fs = require('fs');
 
 /**
  * -------------------------------------------------
@@ -78,12 +81,32 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
             return res.status(400).json({ success: false, message: "Missing required info" });
         }
 
-        // OLD: const pdfPath = path.join(__dirname, 'public', 'resources', ...);
+        // 1. Locate the Template PDF (Vercel Compatible)
+        const templatePath = path.join(process.cwd(), 'public', 'resources', 'Strategic-AI-Clarity-Report.pdf');
 
-            // NEW (Vercel Compatible):
-            const pdfPath = path.join(process.cwd(), 'public', 'resources', 'Strategic-AI-Clarity-Report.pdf');
+        // 2. Load the PDF into memory to edit it
+        const existingPdfBytes = fs.readFileSync(templatePath);
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        
+        // 3. Embed font and write the Name
+        const helveticaFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const pages = pdfDoc.getPages();
+        const firstPage = pages[0]; // Edits the first page (Cover)
 
-        // 1. Send Report to the User
+        // Draw the Client's Name
+        // NOTE: Adjust 'x' and 'y' to position the name perfectly on your specific PDF design
+        firstPage.drawText(fullName, {
+            x: 168,        // Horizontal position 
+            y: 538,        // Vertical position (0 is bottom of page)
+            size: 14,      // Font size
+            font: helveticaFont,
+            color: rgb(0.04, 0.11, 0.23), // Dark Navy (#0B1B3A)
+        });
+
+        // 4. Save the modified PDF to a Buffer (RAM)
+        const pdfBytes = await pdfDoc.save();
+
+        // 5. Send Report to the User
         await transporter.sendMail({
             from: `"Adenola Adegbesan" <${process.env.EMAIL_USER}>`,
             to: email,
@@ -100,13 +123,14 @@ app.post('/api/lead-submission', limiter, async (req, res) => {
             `,
             attachments: [
                 {
-                    filename: 'Strategic-AI-Clarity-Report.pdf',
-                    path: pdfPath 
+                    // Filename now includes the client's name
+                    filename: `Strategic-AI-Clarity-Report-${fullName.replace(/\s+/g, '-')}.pdf`,
+                    content: Buffer.from(pdfBytes) // Sends the edited file from memory
                 }
             ]
         });
 
-        // 2. Internal Admin Notification
+        // 6. Internal Admin Notification
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.EMAIL_USER,
