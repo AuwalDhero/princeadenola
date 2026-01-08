@@ -182,6 +182,58 @@ app.post('/api/newsletter', limiter, async (req, res) => {
         res.status(500).json({ success: false });
     }
 });
+/**
+ * -------------------------------------------------
+ * SPEAKING INQUIRY ENDPOINT
+ * -------------------------------------------------
+ */
+app.post('/api/speaking-inquiry', limiter, async (req, res) => {
+    try {
+        const { name, email, eventType, date, time, message } = req.body;
+
+        if (!name || !email || !eventType || !message) {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+
+        // Admin notification
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: process.env.EMAIL_USER,
+            subject: `New Speaking Inquiry: ${eventType} from ${name}`,
+            html: `
+                <h2>New Speaking Engagement Inquiry</h2>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Event Type:</strong> ${eventType}</p>
+                <p><strong>Preferred Date:</strong> ${date || 'Not specified'}</p>
+                <p><strong>Preferred Time:</strong> ${time || 'Not specified'}</p>
+                <p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>
+            `
+        });
+
+        // Confirmation to user
+        await transporter.sendMail({
+            from: `"Adenola Adegbesan" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Thank You for Your Speaking Inquiry",
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                    <h2>Hi ${name},</h2>
+                    <p>Thank you for your interest in having me speak at your event!</p>
+                    <p>I have received your inquiry for a <strong>${eventType}</strong>.</p>
+                    <p>I will review the details and get back to you as soon as possible.</p>
+                    <br>
+                    <p>Best regards,<br><strong>Adenola Adegbesan</strong><br>The AI Maverick</p>
+                </div>
+            `
+        });
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error("SPEAKING INQUIRY ERROR:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
 
 /**
  * -------------------------------------------------

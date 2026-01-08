@@ -399,3 +399,4 @@ document.getElementById('newsletterForm')?.addEventListener('submit', async (e) 
         alert("Subscription failed.");
     }
 });
+
