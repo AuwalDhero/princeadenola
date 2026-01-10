@@ -796,40 +796,35 @@
             }
         }
     
-        .speaking-animation {
-            position: relative;
-            width: 100%;
-            min-height: 70vh;
-            max-height: 90vh;
-            border-radius: 20px;
-            overflow: hidden;
-            background: var(--deep); /* FIXED: Prevents white flash between images */
-            box-shadow: 0 20px 60px rgba(11, 27, 58, 0.15);
-        }
-    
-        .speaking-animation img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            opacity: 0;
-            animation: speakingFade 16s infinite ease-in-out;
-        }
-    
-        /* FIXED: Adjusted delays for a seamless 4-image loop */
-        .speaking-animation img:nth-child(1) { animation-delay: 0s; }
-        .speaking-animation img:nth-child(2) { animation-delay: 4s; }
-        .speaking-animation img:nth-child(3) { animation-delay: 8s; }
-        .speaking-animation img:nth-child(4) { animation-delay: 12s; }
-    
-        /* FIXED: Improved percentages for smoother cross-fading */
-        @keyframes speakingFade {
-            0%, 100% { opacity: 0; }
-            5%, 25% { opacity: 1; }
-            30%, 95% { opacity: 0; }
-        }
+        .speaking-slider {
+                min-height: 70vh;
+                max-height: 90vh;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 20px 60px rgba(11, 27, 58, 0.15);
+                background: var(--deep); /* Fallback color while images load */
+            }
+
+        .speaking-slider .splide__slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+            }
+
+            /* Hide arrows and dots for clean hero look */
+         .speaking-slider .splide__pagination,
+         .speaking-slider .splide__arrows {
+                display: none;
+            }
+
+            /* Optional: Remove old animation rules to avoid conflicts */
+            /*
+            .speaking-animation,
+            .speaking-animation img,
+            @keyframes speakingFade { ... }
+            */
+        
     </style>
 </head>
 <body>
@@ -870,14 +865,57 @@
                     </p>
                     <button class="btn-primary" onclick="scrollToInquiry()">Inquire About Booking</button>
                 </div>
-                <div class="speaking-animation">
-                    <img src="resources/adenola-speaking-1.jpeg">
-                    <img src="resources/adenola-speaking-2.jpeg">
-                    <img src="resources/adenola-speaking-3.jpeg">
-                    <img src="resources/adenola-speaking-4.jpeg">
-                  </div>
-                  
-            </div>
+                <div class="splide speaking-slider" aria-label="Adenola Adegbesan speaking engagements slideshow">
+    <div class="splide__track">
+        <ul class="splide__list">
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-1.jpeg" alt="Adenola speaking engagement 1" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-2.jpeg" alt="Adenola speaking engagement 2" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-3.jpeg" alt="Adenola speaking engagement 3" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-4.jpeg" alt="Adenola speaking engagement 4" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-5.jpg" alt="Adenola speaking engagement 5" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-6.jpg" alt="Adenola speaking engagement 6" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-7.jpg" alt="Adenola speaking engagement 7" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-8.jpg" alt="Adenola speaking engagement 8" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-9.jpg" alt="Adenola speaking engagement 9" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-10.jpg" alt="Adenola speaking engagement 10" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-11.jpg" alt="Adenola speaking engagement 11" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-12.jpg" alt="Adenola speaking engagement 12" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-13.jpg" alt="Adenola speaking engagement 13" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-14.jpg" alt="Adenola speaking engagement 14" loading="lazy">
+            </li>
+            <li class="splide__slide">
+                <img src="resources/adenola-speaking-15.jpg" alt="Adenola speaking engagement 15" loading="lazy">
+            </li>
+        </ul>
+    </div>
+</div>
         </div>
     </section>
 
@@ -1180,6 +1218,23 @@
             document.querySelectorAll('#mobileMenu a').forEach(link => {
                 link.addEventListener('click', () => toggleMenu(false));
             });
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the speaking hero slider
+            const speakingSlider = document.querySelector('.speaking-slider');
+            if (speakingSlider && typeof Splide !== 'undefined') {
+                new Splide('.speaking-slider', {
+                    type       : 'fade',       // Smooth fade transition
+                    rewind     : true,         // Loop back to start
+                    autoplay   : true,         // Auto-play
+                    interval   : 4000,         // 4 seconds per image
+                    pauseOnHover: true,        // Pause when hovering
+                    arrows     : false,
+                    pagination : false,
+                    speed      : 1000,         // Fade duration
+                    easing     : 'ease'
+                }).mount();
+            }
         });
         
     </script>
