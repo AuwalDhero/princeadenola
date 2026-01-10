@@ -839,7 +839,7 @@
                 </a>
             </div>
             <nav class="nav-links" id="mobileMenu">
-                <a href="index.html">Home</a>
+            
                 <a href="index.html#about">About</a>
                 <a href="index.html#services">Services</a>
                 <a href="speaking.html" class="active">Speaking</a>
@@ -849,9 +849,10 @@
             </nav>
             <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
         </div>
-    </header>
-    <div id="overlay"></div>
+        <div id="overlay"></div>
 
+    </header>
+    
     <!-- Hero -->
     <section class="hero">
         <div class="hero-background"></div>
@@ -1105,10 +1106,8 @@
             </p>
         </div>
     </footer>
-
-    
     <script>
-        // Hero animations + other features (unchanged)
+        // Hero animations + Typed.js + Splide slider
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof Typed !== 'undefined') {
                 new Typed('#typed-speaking', {
@@ -1123,6 +1122,7 @@
                     loop: true
                 });
             }
+    
             anime({
                 targets: '.hero-text-box',
                 translateX: [-50, 0],
@@ -1131,17 +1131,35 @@
                 duration: 1200,
                 delay: 300
             });
+    
+            // Initialize Splide hero slider (15 images)
+            const speakingSlider = document.querySelector('.speaking-slider');
+            if (speakingSlider && typeof Splide !== 'undefined') {
+                new Splide('.speaking-slider', {
+                    type         : 'fade',
+                    rewind       : true,
+                    autoplay     : true,
+                    interval     : 4000,
+                    pauseOnHover : true,
+                    arrows       : false,
+                    pagination   : false,
+                    speed        : 1000,
+                    easing       : 'ease'
+                }).mount();
+            }
         });
     
         function scrollToInquiry() {
             document.getElementById('inquirySection').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     
+        // Speaking inquiry form
         document.getElementById('speakingInquiryForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('.btn-primary');
             btn.textContent = "Sending...";
             btn.disabled = true;
+    
             const payload = {
                 name: document.getElementById('speakerName').value.trim(),
                 email: document.getElementById('speakerEmail').value.trim(),
@@ -1150,6 +1168,7 @@
                 time: document.getElementById('eventTime').value.trim() || 'Not specified',
                 message: document.getElementById('speakerMessage').value.trim()
             };
+    
             try {
                 const res = await fetch('/api/speaking-inquiry', {
                     method: "POST",
@@ -1169,6 +1188,7 @@
             btn.disabled = false;
         });
     
+        // Filter buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1184,60 +1204,16 @@
             });
         });
     
+        // Reveal animations
         const revealObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('visible');
             });
         }, { threshold: 0.15 });
         document.querySelectorAll('.fade-up').forEach(el => revealObserver.observe(el));
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('overlay');
-            const hamburgerIcon = hamburgerBtn?.querySelector('i');
-    
-            if (!hamburgerBtn || !mobileMenu || !overlay || !hamburgerIcon) return;
-    
-            const toggleMenu = (open) => {
-                mobileMenu.classList.toggle('active', open);
-                overlay.classList.toggle('active', open);
-                // Correction inserted here
-                document.body.style.overflow = open ? 'hidden' : 'auto';
-                hamburgerIcon.classList.remove('fa-bars', 'fa-xmark');
-                hamburgerIcon.classList.add(open ? 'fa-xmark' : 'fa-bars');
-            };
-    
-            hamburgerBtn.addEventListener('click', () => {
-                const isOpen = mobileMenu.classList.contains('active');
-                toggleMenu(!isOpen);
-            });
-    
-            overlay.addEventListener('click', () => toggleMenu(false));
-    
-            document.querySelectorAll('#mobileMenu a').forEach(link => {
-                link.addEventListener('click', () => toggleMenu(false));
-            });
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-    // Initialize the speaking hero slider
-            const speakingSlider = document.querySelector('.speaking-slider');
-            if (speakingSlider && typeof Splide !== 'undefined') {
-                new Splide('.speaking-slider', {
-                    type       : 'fade',       // Smooth fade transition
-                    rewind     : true,         // Loop back to start
-                    autoplay   : true,         // Auto-play
-                    interval   : 4000,         // 4 seconds per image
-                    pauseOnHover: true,        // Pause when hovering
-                    arrows     : false,
-                    pagination : false,
-                    speed      : 1000,         // Fade duration
-                    easing     : 'ease'
-                }).mount();
-            }
-        });
-        
     </script>
+    
+    
 </body>
 <script src="main-redesigned.js"></script>
 </html>
